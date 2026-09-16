@@ -14,7 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, Loader2 } from "lucide-react";
-import { importLeadsAction, initialImportState } from "./actions";
+import { importLeadsAction, type ImportActionState } from "./actions";
+
+const initialImportState: ImportActionState = { error: null, summary: null };
 
 export function ImportDialog() {
   const [open, setOpen] = useState(false);

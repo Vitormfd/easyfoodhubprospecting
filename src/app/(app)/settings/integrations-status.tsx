@@ -59,7 +59,7 @@ export function IntegrationsStatus({
         />
         {hasInstagramApp && !instagramConnected && (
           <div className="pt-3">
-            <Button size="sm" variant="outline" render={<a href="/api/instagram/connect" />}>
+            <Button size="sm" variant="outline" nativeButton={false} render={<a href="/api/instagram/connect" />}>
               Conectar conta do Instagram
             </Button>
           </div>

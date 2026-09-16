@@ -15,7 +15,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Plus, Pencil } from "lucide-react";
-import { saveTemplateAction, initialTemplateState } from "./actions";
+import { saveTemplateAction, type TemplateActionState } from "./actions";
+
+const initialTemplateState: TemplateActionState = { error: null, success: false };
 import { MESSAGE_VARIABLES } from "@/lib/constants";
 import type { MessageTemplate } from "@/types/database";
 

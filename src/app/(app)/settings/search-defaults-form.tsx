@@ -14,7 +14,9 @@ import {
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { BRAZIL_STATES, SEGMENTS } from "@/lib/constants";
-import { updateSearchDefaultsAction, initialSettingsState } from "./actions";
+import { updateSearchDefaultsAction, type SettingsActionState } from "./actions";
+
+const initialSettingsState: SettingsActionState = { error: null, success: false };
 
 export function SearchDefaultsForm({
   defaultCity,

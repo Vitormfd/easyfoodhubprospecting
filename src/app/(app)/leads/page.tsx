@@ -51,11 +51,12 @@ export default async function LeadsPage({
           <Button
             variant="outline"
             size="sm"
+            nativeButton={false}
             render={<a href={`/api/leads/export${exportQuery ? `?${exportQuery}` : ""}`} />}
           >
             <Download className="size-4" /> Exportar CSV
           </Button>
-          <Button size="sm" render={<Link href="/search" />}>
+          <Button size="sm" nativeButton={false} render={<Link href="/search" />}>
             <Search className="size-4" /> Buscar mais
           </Button>
         </div>

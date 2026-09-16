@@ -147,7 +147,11 @@ export function QueueRunner({
                   setMessage(generated);
                 });
               }}>
-                <SelectTrigger className="w-44"><SelectValue placeholder="Outro template..." /></SelectTrigger>
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder="Outro template...">
+                    {(value: string) => templates.find((t) => t.id === value)?.name ?? "Outro template..."}
+                  </SelectValue>
+                </SelectTrigger>
                 <SelectContent>
                   {templates.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
                 </SelectContent>

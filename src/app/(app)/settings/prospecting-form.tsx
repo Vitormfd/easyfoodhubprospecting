@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
-import { updateProspectingSettingsAction, initialSettingsState } from "./actions";
+import { updateProspectingSettingsAction, type SettingsActionState } from "./actions";
+
+const initialSettingsState: SettingsActionState = { error: null, success: false };
 
 export function ProspectingForm({
   intervals,

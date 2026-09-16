@@ -17,6 +17,14 @@ import { Loader2, Sparkles, FileText, Copy, AtSign, Send } from "lucide-react";
 import { generateMessageAction, logContactAction } from "@/lib/actions/prospecting";
 import type { Lead, ContactChannel } from "@/types/database";
 
+const CHANNEL_LABELS: Record<ContactChannel, string> = {
+  instagram: "Instagram",
+  whatsapp: "WhatsApp",
+  telefone: "Telefone",
+  email: "Email",
+  outro: "Outro",
+};
+
 export function MessageComposer({
   lead,
   templates,
@@ -87,7 +95,11 @@ export function MessageComposer({
             Gerar com IA
           </Button>
           <Select value={templateId} onValueChange={(v) => setTemplateId(v ?? "")}>
-            <SelectTrigger className="w-48"><SelectValue placeholder="Escolher template" /></SelectTrigger>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Escolher template">
+                {(value: string) => templates.find((t) => t.id === value)?.name ?? "Escolher template"}
+              </SelectValue>
+            </SelectTrigger>
             <SelectContent>
               {templates.length === 0 && <SelectItem value="__none__" disabled>Nenhum template criado</SelectItem>}
               {templates.map((t) => (
@@ -114,7 +126,9 @@ export function MessageComposer({
 
         <div className="flex flex-wrap items-center gap-2">
           <Select value={channel} onValueChange={(v) => v && setChannel(v as ContactChannel)}>
-            <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-36">
+              <SelectValue>{(value: ContactChannel) => CHANNEL_LABELS[value]}</SelectValue>
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="instagram">Instagram</SelectItem>
               <SelectItem value="whatsapp">WhatsApp</SelectItem>

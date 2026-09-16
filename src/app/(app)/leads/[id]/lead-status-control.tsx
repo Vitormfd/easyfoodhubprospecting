@@ -30,6 +30,16 @@ export function LeadStatusControl({
   const [currentStatus, setCurrentStatus] = useState(status);
   const [notesValue, setNotesValue] = useState(notes ?? "");
   const [pendingStatus, startStatusTransition] = useTransition();
+
+  // O status pode mudar por outra ação na página (ex.: registrar contato
+  // muda o status automaticamente). Re-sincroniza durante a renderização
+  // quando o server component pai manda um status novo — ver
+  // https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  const [prevStatus, setPrevStatus] = useState(status);
+  if (status !== prevStatus) {
+    setPrevStatus(status);
+    setCurrentStatus(status);
+  }
   const [pendingNotes, startNotesTransition] = useTransition();
 
   function handleStatusChange(value: string | null) {
@@ -64,7 +74,9 @@ export function LeadStatusControl({
         <div className="space-y-2">
           <Label>Status</Label>
           <Select value={currentStatus} onValueChange={handleStatusChange} disabled={pendingStatus}>
-            <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-full">
+              <SelectValue>{(value: string) => LEAD_STATUS_LABELS[value as keyof typeof LEAD_STATUS_LABELS]}</SelectValue>
+            </SelectTrigger>
             <SelectContent>
               {LEAD_STATUS_ORDER.map((s) => (
                 <SelectItem key={s} value={s}>{LEAD_STATUS_LABELS[s]}</SelectItem>

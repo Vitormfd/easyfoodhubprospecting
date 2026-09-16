@@ -12,8 +12,6 @@ export interface ImportActionState {
   summary: { total: number; inserted: number; skipped: number; invalid: number } | null;
 }
 
-export const initialImportState: ImportActionState = { error: null, summary: null };
-
 type CsvRow = Record<string, string>;
 
 function pick(row: CsvRow, ...keys: string[]): string | null {

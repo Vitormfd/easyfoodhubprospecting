@@ -130,7 +130,9 @@ export function FingerprintsManager({
             <div className="space-y-1.5">
               <Label>Tipo de sinal</Label>
               <Select value={signalType} onValueChange={(v) => setSignalType(v as FingerprintSignalType)}>
-                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-full">
+                  <SelectValue>{(value: FingerprintSignalType) => SIGNAL_LABELS[value]}</SelectValue>
+                </SelectTrigger>
                 <SelectContent>
                   {(Object.keys(SIGNAL_LABELS) as FingerprintSignalType[]).map((k) => (
                     <SelectItem key={k} value={k}>{SIGNAL_LABELS[k]}</SelectItem>

@@ -16,6 +16,45 @@ import { LEAD_STATUS_ORDER, LEAD_STATUS_LABELS } from "@/lib/constants";
 
 const ALL = "__all__";
 
+const COMPETITOR_LABELS: Record<string, string> = {
+  [ALL]: "Todos os leads",
+  confirmado: "Anota AI confirmado",
+  provavel: "Anota AI provável",
+  any_signal: "Confirmado ou provável",
+};
+
+const STATUS_FILTER_LABELS: Record<string, string> = {
+  [ALL]: "Todos os status",
+  ...LEAD_STATUS_LABELS,
+};
+
+const CONTACTED_LABELS: Record<string, string> = {
+  [ALL]: "Todos",
+  yes: "Contatados",
+  no: "Não contatados",
+};
+
+const INSTAGRAM_LABELS: Record<string, string> = {
+  [ALL]: "Instagram: todos",
+  "1": "Com Instagram",
+};
+
+const WHATSAPP_LABELS: Record<string, string> = {
+  [ALL]: "WhatsApp: todos",
+  "1": "Com WhatsApp",
+};
+
+const SORT_LABELS: Record<string, string> = {
+  recent: "Mais recentes",
+  confidence: "Maior confiança",
+  no_contact: "Sem contato",
+  last_contact: "Último contato",
+};
+
+function labeled(labels: Record<string, string>) {
+  return (value: string) => labels[value] ?? value;
+}
+
 export function LeadsFilters({
   cities,
   segments,
@@ -50,7 +89,7 @@ export function LeadsFilters({
       />
 
       <Select defaultValue={searchParams.get("competitor") ?? ALL} onValueChange={(v) => set("competitor", v)}>
-        <SelectTrigger className="w-44"><SelectValue placeholder="Concorrente" /></SelectTrigger>
+        <SelectTrigger className="w-44"><SelectValue placeholder="Concorrente">{labeled(COMPETITOR_LABELS)}</SelectValue></SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>Todos os leads</SelectItem>
           <SelectItem value="confirmado">Anota AI confirmado</SelectItem>
@@ -60,7 +99,7 @@ export function LeadsFilters({
       </Select>
 
       <Select defaultValue={searchParams.get("status") ?? ALL} onValueChange={(v) => set("status", v)}>
-        <SelectTrigger className="w-40"><SelectValue placeholder="Status" /></SelectTrigger>
+        <SelectTrigger className="w-40"><SelectValue placeholder="Status">{labeled(STATUS_FILTER_LABELS)}</SelectValue></SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>Todos os status</SelectItem>
           {LEAD_STATUS_ORDER.map((s) => (
@@ -90,7 +129,7 @@ export function LeadsFilters({
       </Select>
 
       <Select defaultValue={searchParams.get("contacted") ?? ALL} onValueChange={(v) => set("contacted", v)}>
-        <SelectTrigger className="w-36"><SelectValue placeholder="Contato" /></SelectTrigger>
+        <SelectTrigger className="w-36"><SelectValue placeholder="Contato">{labeled(CONTACTED_LABELS)}</SelectValue></SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>Todos</SelectItem>
           <SelectItem value="yes">Contatados</SelectItem>
@@ -102,7 +141,7 @@ export function LeadsFilters({
         defaultValue={searchParams.get("hasInstagram") === "1" ? "1" : ALL}
         onValueChange={(v) => set("hasInstagram", v === "1" ? "1" : null)}
       >
-        <SelectTrigger className="w-36"><SelectValue placeholder="Instagram" /></SelectTrigger>
+        <SelectTrigger className="w-36"><SelectValue placeholder="Instagram">{labeled(INSTAGRAM_LABELS)}</SelectValue></SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>Instagram: todos</SelectItem>
           <SelectItem value="1">Com Instagram</SelectItem>
@@ -113,7 +152,7 @@ export function LeadsFilters({
         defaultValue={searchParams.get("hasWhatsapp") === "1" ? "1" : ALL}
         onValueChange={(v) => set("hasWhatsapp", v === "1" ? "1" : null)}
       >
-        <SelectTrigger className="w-36"><SelectValue placeholder="WhatsApp" /></SelectTrigger>
+        <SelectTrigger className="w-36"><SelectValue placeholder="WhatsApp">{labeled(WHATSAPP_LABELS)}</SelectValue></SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>WhatsApp: todos</SelectItem>
           <SelectItem value="1">Com WhatsApp</SelectItem>
@@ -121,7 +160,7 @@ export function LeadsFilters({
       </Select>
 
       <Select defaultValue={searchParams.get("sort") ?? "recent"} onValueChange={(v) => set("sort", v)}>
-        <SelectTrigger className="w-44"><SelectValue placeholder="Ordenar" /></SelectTrigger>
+        <SelectTrigger className="w-44"><SelectValue placeholder="Ordenar">{labeled(SORT_LABELS)}</SelectValue></SelectTrigger>
         <SelectContent>
           <SelectItem value="recent">Mais recentes</SelectItem>
           <SelectItem value="confidence">Maior confiança</SelectItem>

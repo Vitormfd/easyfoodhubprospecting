@@ -8,8 +8,6 @@ export interface TemplateActionState {
   success: boolean;
 }
 
-export const initialTemplateState: TemplateActionState = { error: null, success: false };
-
 async function requireUser() {
   const supabase = await createClient();
   const {

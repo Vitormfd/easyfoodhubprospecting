@@ -19,8 +19,6 @@ export interface SettingsActionState {
   success: boolean;
 }
 
-export const initialSettingsState: SettingsActionState = { error: null, success: false };
-
 export async function updateSearchDefaultsAction(
   _prev: SettingsActionState,
   formData: FormData,

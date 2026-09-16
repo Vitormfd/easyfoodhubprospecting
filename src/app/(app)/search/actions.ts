@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { searchEstablishments } from "@/lib/sources";
 import { buildDedupKey } from "@/lib/dedupe";
-import { detectCompetitorForLead } from "@/lib/detectors";
+import { detectCompetitorForLead, loadCompetitorContext } from "@/lib/detectors";
 import type { LeadInsert } from "@/types/database";
 
 export interface SearchActionState {
@@ -18,8 +18,6 @@ export interface SearchActionState {
     insertedLeads: { id: string; business_name: string; city: string; state: string; website: string | null }[];
   } | null;
 }
-
-export const initialSearchState: SearchActionState = { error: null, result: null };
 
 export async function runSearchAction(
   _prev: SearchActionState,
@@ -128,16 +126,19 @@ export async function detectBatchAction(leadIds: string[]) {
 
   const queue = leads ?? [];
   const summary = { confirmado: 0, provavel: 0, nao_identificado: 0, erros: 0 };
+  const competitorContext = await loadCompetitorContext(supabase);
 
   let index = 0;
   async function worker() {
     while (index < queue.length) {
       const lead = queue[index++];
       try {
-        const result = await detectCompetitorForLead(supabase, lead.id, {
-          menuUrl: lead.menu_url,
-          website: lead.website,
-        });
+        const result = await detectCompetitorForLead(
+          supabase,
+          lead.id,
+          { menuUrl: lead.menu_url, website: lead.website },
+          competitorContext,
+        );
         summary[result.status]++;
       } catch {
         summary.erros++;
