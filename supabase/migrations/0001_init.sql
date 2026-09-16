@@ -345,26 +345,26 @@ insert into public.competitors (slug, name) values
   ('anota_ai', 'Anota AI');
 
 insert into public.competitor_fingerprints (competitor_id, signal_type, pattern, weight, description)
-select id, 'domain', 'anota.ai', 60, 'Domínio ou subdomínio oficial do Anota AI (ex.: pedido.anota.ai, loja.anota.ai)'
+select id, 'domain'::fingerprint_signal_type, 'anota.ai', 60, 'Domínio ou subdomínio oficial do Anota AI (ex.: pedido.anota.ai, loja.anota.ai)'
 from public.competitors where slug = 'anota_ai'
 union all
-select id, 'domain', 'anotaai.com.br', 55, 'Domínio alternativo usado pela plataforma Anota AI'
+select id, 'domain'::fingerprint_signal_type, 'anotaai.com.br', 55, 'Domínio alternativo usado pela plataforma Anota AI'
 from public.competitors where slug = 'anota_ai'
 union all
-select id, 'script_src', 'cdn.anota.ai', 50, 'Script/CDN carregado pelo cardápio digital do Anota AI'
+select id, 'script_src'::fingerprint_signal_type, 'cdn.anota.ai', 50, 'Script/CDN carregado pelo cardápio digital do Anota AI'
 from public.competitors where slug = 'anota_ai'
 union all
-select id, 'script_src', 'assets.anotaai', 40, 'Bundle JS/CSS com prefixo anotaai em produção'
+select id, 'script_src'::fingerprint_signal_type, 'assets.anotaai', 40, 'Bundle JS/CSS com prefixo anotaai em produção'
 from public.competitors where slug = 'anota_ai'
 union all
-select id, 'meta', 'anota ai', 30, 'Meta tag (application-name, generator, og:site_name) mencionando "Anota AI"'
+select id, 'meta'::fingerprint_signal_type, 'anota ai', 30, 'Meta tag (application-name, generator, og:site_name) mencionando "Anota AI"'
 from public.competitors where slug = 'anota_ai'
 union all
-select id, 'html_pattern', 'data-anotaai', 35, 'Atributo data-* específico de componentes do widget Anota AI'
+select id, 'html_pattern'::fingerprint_signal_type, 'data-anotaai', 35, 'Atributo data-* específico de componentes do widget Anota AI'
 from public.competitors where slug = 'anota_ai'
 union all
-select id, 'html_pattern', 'powered by anota', 25, 'Texto de rodapé "powered by Anota AI" ou similar'
+select id, 'html_pattern'::fingerprint_signal_type, 'powered by anota', 25, 'Texto de rodapé "powered by Anota AI" ou similar'
 from public.competitors where slug = 'anota_ai'
 union all
-select id, 'header', 'x-powered-by: anota', 45, 'Header HTTP de resposta identificando a infraestrutura Anota AI'
+select id, 'header'::fingerprint_signal_type, 'x-powered-by: anota', 45, 'Header HTTP de resposta identificando a infraestrutura Anota AI'
 from public.competitors where slug = 'anota_ai';
