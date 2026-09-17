@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import {
@@ -79,12 +79,26 @@ export function LeadsFilters({
 
   const hasFilters = [...searchParams.keys()].length > 0;
 
+  // Input controlado (não defaultValue): evita o input alternar entre
+  // não-controlado/controlado quando a query string muda por fora dele
+  // (ex.: o botão "Limpar"), o que o Base UI acusa como warning.
+  const urlQuery = searchParams.get("q") ?? "";
+  const [queryInput, setQueryInput] = useState(urlQuery);
+  const [prevUrlQuery, setPrevUrlQuery] = useState(urlQuery);
+  if (urlQuery !== prevUrlQuery) {
+    setPrevUrlQuery(urlQuery);
+    setQueryInput(urlQuery);
+  }
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Input
         placeholder="Buscar por nome..."
-        defaultValue={searchParams.get("q") ?? ""}
-        onChange={(e) => set("q", e.target.value)}
+        value={queryInput}
+        onChange={(e) => {
+          setQueryInput(e.target.value);
+          set("q", e.target.value);
+        }}
         className="w-56"
       />
 
@@ -109,7 +123,9 @@ export function LeadsFilters({
       </Select>
 
       <Select defaultValue={searchParams.get("city") ?? ALL} onValueChange={(v) => set("city", v)}>
-        <SelectTrigger className="w-40"><SelectValue placeholder="Cidade" /></SelectTrigger>
+        <SelectTrigger className="w-40">
+          <SelectValue placeholder="Cidade">{(v: string) => (v === ALL ? "Todas as cidades" : v)}</SelectValue>
+        </SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>Todas as cidades</SelectItem>
           {cities.map((c) => (
@@ -119,7 +135,9 @@ export function LeadsFilters({
       </Select>
 
       <Select defaultValue={searchParams.get("segment") ?? ALL} onValueChange={(v) => set("segment", v)}>
-        <SelectTrigger className="w-40"><SelectValue placeholder="Segmento" /></SelectTrigger>
+        <SelectTrigger className="w-40">
+          <SelectValue placeholder="Segmento">{(v: string) => (v === ALL ? "Todos os segmentos" : v)}</SelectValue>
+        </SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>Todos os segmentos</SelectItem>
           {segments.map((s) => (

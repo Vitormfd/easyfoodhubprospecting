@@ -148,10 +148,17 @@ export function SearchForm({
             </div>
 
             {state.result.sourceErrors.length > 0 && (
-              <Alert>
+              <Alert variant={state.result.total === 0 ? "destructive" : "default"}>
                 <AlertTriangle className="size-4" />
-                <AlertTitle>Algumas fontes falharam</AlertTitle>
+                <AlertTitle>
+                  {state.result.total === 0
+                    ? "A busca falhou — não é necessariamente \"sem resultados\""
+                    : "Algumas fontes falharam"}
+                </AlertTitle>
                 <AlertDescription>
+                  {state.result.total === 0
+                    ? "A fonte de dados não respondeu a tempo (comum em horários de pico). Tente buscar de novo em alguns segundos antes de assumir que não há estabelecimentos nessa cidade. "
+                    : ""}
                   {state.result.sourceErrors.map((e) => `${e.source}: ${e.message}`).join(" · ")}
                 </AlertDescription>
               </Alert>
@@ -161,7 +168,9 @@ export function SearchForm({
               {state.result.insertedLeads.length === 0 && (
                 <p className="p-4 text-sm text-muted-foreground">
                   {state.result.total === 0
-                    ? "Nenhum estabelecimento encontrado para essa combinação de cidade/segmentos. Tente outros segmentos ou confira a grafia da cidade."
+                    ? state.result.sourceErrors.length > 0
+                      ? "Nenhum resultado — veja o aviso acima antes de tentar outra cidade."
+                      : "Nenhum estabelecimento encontrado para essa combinação de cidade/segmentos. Tente outros segmentos ou confira a grafia da cidade."
                     : "Nenhum lead novo — todos os resultados já estavam cadastrados."}
                 </p>
               )}

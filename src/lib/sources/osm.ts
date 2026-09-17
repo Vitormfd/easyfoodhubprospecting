@@ -67,7 +67,10 @@ interface OverpassElement {
   tags?: Record<string, string>;
 }
 
-async function geocodeCity(
+/** "Cidade não encontrada" (resultado vazio legítimo) — nunca lançada por falha de rede/timeout. */
+class CityNotFoundError extends Error {}
+
+async function geocodeCityOnce(
   city: string,
   state: string,
 ): Promise<[south: number, west: number, north: number, east: number] | null> {
@@ -78,16 +81,56 @@ async function geocodeCity(
   url.searchParams.set("format", "json");
   url.searchParams.set("limit", "1");
 
-  const res = await fetch(url, {
-    headers: { "User-Agent": USER_AGENT, "Accept-Language": "pt-BR" },
-  });
-  if (!res.ok) return null;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12_000);
 
-  const results = (await res.json()) as NominatimResult[];
-  if (results.length === 0) return null;
+  try {
+    const res = await fetch(url, {
+      headers: { "User-Agent": USER_AGENT, "Accept-Language": "pt-BR" },
+      signal: controller.signal,
+    });
 
-  const [south, north, west, east] = results[0].boundingbox.map(Number);
-  return [south, west, north, east];
+    if (!res.ok) {
+      throw new Error(`Nominatim respondeu ${res.status} ao geocodificar "${city}, ${state}"`);
+    }
+
+    const results = (await res.json()) as NominatimResult[];
+    if (results.length === 0) {
+      throw new CityNotFoundError(`Cidade "${city}, ${state}" não encontrada no OpenStreetMap.`);
+    }
+
+    const [south, north, west, east] = results[0].boundingbox.map(Number);
+    return [south, west, north, east];
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/**
+ * Geocodifica com uma retentativa — o Nominatim público é sensível a
+ * rate limit/timeout, e sem retry uma falha transitória vira
+ * silenciosamente "0 resultados" para o usuário, que não tem como
+ * distinguir isso de "não há estabelecimentos nessa cidade".
+ */
+async function geocodeCity(
+  city: string,
+  state: string,
+): Promise<[south: number, west: number, north: number, east: number] | null> {
+  try {
+    return await geocodeCityOnce(city, state);
+  } catch (err) {
+    if (err instanceof CityNotFoundError) return null;
+    // Falha de rede/timeout/status: uma retentativa antes de desistir de vez.
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      return await geocodeCityOnce(city, state);
+    } catch (retryErr) {
+      if (retryErr instanceof CityNotFoundError) return null;
+      throw retryErr instanceof Error
+        ? retryErr
+        : new Error("Falha ao geocodificar a cidade (Nominatim).");
+    }
+  }
 }
 
 function buildAddress(tags: Record<string, string>): string | null {
@@ -132,7 +175,17 @@ async function runOverpassQuery(query: string): Promise<{ elements: OverpassElem
         continue;
       }
 
-      return (await res.json()) as { elements: OverpassElement[] };
+      const body = (await res.json()) as { elements?: OverpassElement[]; remark?: string };
+
+      // O Overpass às vezes responde 200 + JSON válido mesmo quando a
+      // consulta falhou internamente (ex.: timeout do próprio servidor),
+      // sinalizando isso só no campo `remark` — sem elements confiáveis.
+      if (body.remark && !body.elements) {
+        lastError = `${endpoint}: ${body.remark}`;
+        continue;
+      }
+
+      return { elements: body.elements ?? [] };
     } catch (err) {
       lastError = `${endpoint}: ${err instanceof Error ? err.message : "erro desconhecido"}`;
     } finally {
